@@ -1,7 +1,7 @@
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+from datetime import datetime, timedelta
 from .extension import db
 
 class Students(db.Model):
@@ -75,7 +75,7 @@ import bcrypt
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -102,14 +102,12 @@ class Login_attempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     email = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     ip_address = db.Column(db.String(100), nullable=False)
     login_status = db.Column(db.String(100), nullable=False)
 
-    def __init__(self, email, password, ip_address, login_status):
+    def __init__(self, email, ip_address, login_status):
         self.email = email
-        self.password = password
         self.ip_address = ip_address
         self.login_status = login_status
 
@@ -119,6 +117,8 @@ class Session(db.Model):
     session_id = db.Column(db.String(100), unique=True, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.now)
     session_status = db.Column(db.String(100), nullable=False, default="active")
+    expires_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now() + timedelta(hours=24))
+
 
     def __init__(self, user_id, session_id):
         self.user_id = user_id

@@ -1,3 +1,4 @@
+from flask import request
 import jwt
 import datetime
 from library.extension import db
@@ -13,7 +14,6 @@ from library.session.services import create_session
 def create_login_attempt(data, user, login_status):
     new_login_attempt = Login_attempt(
         email=data["email"],
-        password=data["password"],
         ip_address=request.remote_addr,
         login_status=login_status
     )
